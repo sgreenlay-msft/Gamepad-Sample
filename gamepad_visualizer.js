@@ -34,6 +34,17 @@ function StandardGamepadVisualizer(pad) {
                 this.leftTriggerVisualizer.setValue(buttonLeftTrigger.value, buttonLeftTrigger.pressed);
                 this.rightTriggerVisualizer.setValue(buttonRightTrigger.value, buttonRightTrigger.pressed);
 
+                if (pad.vibrationActuator) {
+                    var vibrarion = Math.max(buttonLeftTrigger.value, buttonRightTrigger.value);
+                    if (vibrarion > 0) {
+                        pad.vibrationActuator.playEffect("dual-rumble", {
+                            duration: 100,
+                            strongMagnitude: vibrarion,
+                            weakMagnitude: vibrarion
+                        });
+                    }
+                }
+
                 this.UpdateButtons(pad);
 
                 UpdateGamepadStateTable(pad, pad.index);
@@ -128,12 +139,16 @@ function GenericGamepadVisualizer(pad) {
                     visualizer.setValue(button.value, button.pressed);
                 }
 
+                var maxAxis = 0.0;
                 for (var index = 0; index < pad.axes.length; index += 2) {
                     var elemId = "gp" + this.index + "Axis" + index;
                     var visualizer = new AxisVisualizer(elemId);
                     visualizer.setXAxisValue(pad.axes[index]);
                     if (pad.axes[index + 1]) {
                         visualizer.setYAxisValue(pad.axes[index + 1]);
+                    }
+                    if (pad.axes[index] > maxAxis) {
+                        maxAxis = pad.axes[index];
                     }
                 }
 
